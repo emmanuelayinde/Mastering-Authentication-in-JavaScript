@@ -1,4 +1,4 @@
-// middleware/auth.js
+// middleware/authMiddleware.js
 const jwtService = require("../services/jwtService");
 
 module.exports = (req, res, next) => {
@@ -9,7 +9,8 @@ module.exports = (req, res, next) => {
   }
 
   try {
-    const decoded = jwtService.verifyToken(token);
+    const decoded = jwtService.verifyAccessToken(token);
+
     req.user = decoded;
     next();
   } catch (error) {

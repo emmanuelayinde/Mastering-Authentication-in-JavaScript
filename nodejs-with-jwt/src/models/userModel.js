@@ -9,4 +9,5 @@ module.exports = {
   findByEmail: (email) => {
     return users.find((user) => user.email === email);
   },
+  users,
 };

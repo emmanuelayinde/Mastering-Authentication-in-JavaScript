@@ -1,5 +1,7 @@
 // services/authService.js
 const bcrypt = require("bcrypt");
+const crypto = require("crypto");
+const jwtService = require("./jwtService");
 const userModel = require("../models/userModel");
 
 exports.registerUser = async (username, email, password) => {
@@ -29,6 +31,7 @@ exports.loginUser = async (email, password) => {
   if (!user) {
     throw new Error("User not found");
   }
+  console.log({ user });
 
   const isPasswordValid = await bcrypt.compare(password, user.password);
   if (!isPasswordValid) {
@@ -59,16 +62,17 @@ exports.refreshToken = async (refreshToken) => {
 };
 
 exports.forgotPassword = async (email) => {
-  const user = User.findByEmail(email);
+  const user = userModel.findByEmail(email);
   if (!user) {
     throw new Error("User not found");
   }
 
-  const resetToken = crypto.randomBytes(20).toString("hex");
-  const resetTokenExpiry = Date.now() + 3600000; // 1 hour from now
+  const resetToken = crypto.randomBytes(16).toString("hex");
+  const resetTokenExpiry = Date.now() + 1 * 60 * 60 * 1000; // 1 hour from now
 
   // In a real app, save resetToken and resetTokenExpiry to user in database
   user.resetToken = resetToken;
+  console.log({ resetToken });
   user.resetTokenExpiry = resetTokenExpiry;
 
   // In a real app, send email with reset link
@@ -76,7 +80,7 @@ exports.forgotPassword = async (email) => {
 };
 
 exports.resetPassword = async (resetToken, newPassword) => {
-  const user = User.find(
+  const user = userModel.users.find(
     (user) =>
       user.resetToken === resetToken && user.resetTokenExpiry > Date.now()
   );
